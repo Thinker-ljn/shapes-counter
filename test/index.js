@@ -91,7 +91,7 @@ describe('count shape', function() {
     assert(dir === 'b')
   })
 
-  it ('Counter instance strokePath', function () {
+  it ('Counter instance findBoundary', function () {
     let counter = this.counter
     counter.dataArray = [
       [0, 1, 0, 1, 0],
@@ -100,7 +100,7 @@ describe('count shape', function() {
       [0, 0, 1, 0, 0],
       [0, 0, 1, 0, 0]
     ]
-    counter.strokePath(1, 0)
+    counter.findBoundary(1, 0)
     let path = [
       [1, 0, 'r'],
       [2, 1, 'rb'],

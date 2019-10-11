@@ -1,9 +1,10 @@
 class Counter {
-  constructor (imagePath) {
+  constructor (imagePath, afterLoad = null) {
     this.imagePath = imagePath
     this.count = 0
     this.dirtyCount = 0
     this.visitMap = {}
+    this.afterLoad = afterLoad
     this.init()
   }
 
@@ -65,12 +66,14 @@ class Counter {
       this.height = height
 
       let canvas = document.createElement('canvas')
-      // document.body.appendChild(canvas)
+      document.body.appendChild(canvas)
       // document.body.appendChild(image)
       canvas.width = width
       canvas.height = height
 
       this.canvas = canvas
+
+      if (this.afterLoad) this.afterLoad(this)
     })
   }
 
@@ -169,7 +172,7 @@ class Counter {
     return null
   }
   // 由开始点描出路径
-  strokePath (x, y, dir = 'r') {
+  findBoundary  (x, y, dir = 'r') {
     let startKey = `${x}-${y}`
     this.currPath = [[x, y, dir]]
     this.currPathMap = {startKey: true}
@@ -197,6 +200,19 @@ class Counter {
       this.visitMap[key] = true
     }
   }
+
+  strokeBoundary (color) {
+    let path = this.currPath
+    let ctx = this.canvas.getContext('2d')
+    ctx.save()
+    ctx.fillStyle = color
+    for (let point of path) {
+      let [x, y] = point
+      ctx.fillRect(x, y, 1, 1)
+    }
+    ctx.restore()
+  }
+
   // 找开始点
   analyze () {
     let {dataArray, width, height} = this
@@ -214,7 +230,8 @@ class Counter {
         if (!dirty) enter = false
 
         if (!enter && dirty) {
-          this.strokePath(x, y)
+          this.findBoundary(x, y)
+          this.strokeBoundary('red')
           this.count++
         }
       }
@@ -223,4 +240,7 @@ class Counter {
   }
 }
 
-module.exports = Counter
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined')
+    module.exports = Counter;
+  else
+    window.Counter = Counter;
